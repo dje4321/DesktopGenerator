@@ -17,8 +17,8 @@ def pathConv(path):
 		if path[0] == '~': # Check if path is based on home directory
 			path = strPop(path,[0])
 			return subprocess.getoutput("echo $HOME") + path
-	else:
-		return path
+			
+	return path
 
 def getInput(string,Default=None,Lower=False,Upper=False): # Function to get input from user
     while True: # Run forever for incase of no input
@@ -57,7 +57,7 @@ comment = getInput("Comment:") # Comment of application
 execPath = pathConv(getInput("Exec:")) # Path to executable
 terminal = getInput("Start with terminal? [true/False]:",Default="false",Lower=True) # See if it needs to be run with a terminal 
 appType = getInput("Type [Application]:",Default='Application') # Type of application
-icon = getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg") # What icon to use
+icon = pathConv(getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg")) # What icon to use
 categories = getInput("Category, ';' separated [Utility;]:",Default="Utility;") # What catagory to use
 executable = getInput("Mark as executable? [True/false]:",Default="True",Lower=True) # See if the .desktop file needs to be marked with the execuable function
 
@@ -74,5 +74,5 @@ output.write('Categories=' + categories + '\n') # write what category to use for
 
 output.close() # close the file
 
-if executable == "True": # Check is we need to mark .desktop as executable
+if executable == "true": # Check is we need to mark .desktop as executable
     os.system("chmod +x " + installPath)
