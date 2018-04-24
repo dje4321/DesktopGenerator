@@ -4,21 +4,8 @@ import sys # Only used for debugging
 
 os.system('clear') # Clear the screen for input
 
-def strPop(string,pos):
-	output = ''
-	for x in range(0,len(string)):
-		for i in range(0,len(pos)):
-			if x != pos[i]:
-				output += string[x]
-	return output
-
 def pathConv(path):
-	if path[0] != "/": # Check if path is absolute
-		if path[0] == '~': # Check if path is based on home directory
-			path = strPop(path,[0])
-			return subprocess.getoutput("echo $HOME") + path
-			
-	return path
+	return os.path.abspath(path) # Works as a solution right now. Cant handle very complex indirect paths
 
 def getInput(string,Default=None,Lower=False,Upper=False): # Function to get input from user
     while True: # Run forever for incase of no input
