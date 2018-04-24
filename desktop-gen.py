@@ -1,8 +1,29 @@
 #!/usr/bin/python3
-import os, os.path, time, subprocess
-import sys # Only used for debugging
+import os, os.path, time, subprocess, sys
+argv = sys.argv
 
 os.system('clear') # Clear the screen for input
+
+def findArgv(argv,condidtion): # Find the position of something in argv and returns the position
+    try:
+        for x in range(0,len(argv)):
+            for i in range(0,len(condidtion)):
+                if argv[x] == condidtion[i]:
+                    return x
+    except Exception as e:  
+        print("findArgv()\n{}".format(e))
+        sys.exit()
+
+def checkArgv(argv,condidition): # Will check to see if a argument has been passed
+    try:
+        for x in range(0,len(argv)):
+            for i in range(0,len(condidition)):
+                if argv[x] == condidition[i]:
+                    return True
+        return False
+    except Exception as e:  
+        print("checkArgv()\n{}".format(e))
+        sys.exit()
 
 def pathConv(path):
 	return os.path.abspath(path) # Works as a solution right now. Cant handle very complex indirect paths
@@ -25,10 +46,16 @@ def getInput(string,Default=None,Lower=False,Upper=False): # Function to get inp
             os.system('clear')
 
 #########################################################################################################################################
-#sys.exit()
+
+if checkArgv(argv,["-h","--help"]) == True:
+	print(
+"""{}
+    -h --help			Prints this help message
+    -o --output			Specifys where to save the file""".format(argv[0]))
+	sys.exit()
 
 loop = True
-while loop == True:
+while loop == True and checkArgv(argv,["-o","--output"]) != True:
     installPath = pathConv(getInput("Install path [./output.desktop]:",Default="./output.desktop")) # Get output of desktop file
 
     if os.path.isfile(installPath) == True:
@@ -38,6 +65,8 @@ while loop == True:
         os.system("clear")
     else:
         loop = False
+if checkArgv(argv,["-o","--output"]) == True:
+	installPath = pathConv(argv[findArgv(argv,["-o","--output"]) + 1])
 
 name = getInput("Name:") # Name of application
 comment = getInput("Comment:") # Comment of application
