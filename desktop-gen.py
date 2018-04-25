@@ -51,7 +51,8 @@ if checkArgv(argv,["-h","--help"]) == True:
 	print(
 """{}
     -h --help			Prints this help message
-    -o --output			Specifys where to save the file""".format(argv[0]))
+    -o --output			Specifys where to save the file
+    -t --terminal       Enable opening with a terminal""".format(argv[0]))
 	sys.exit()
 
 loop = True
@@ -71,11 +72,15 @@ if checkArgv(argv,["-o","--output"]) == True:
 name = getInput("Name:") # Name of application
 comment = getInput("Comment:") # Comment of application
 execPath = pathConv(getInput("Exec:")) # Path to executable
-terminal = getInput("Start with terminal? [true/False]:",Default="false",Lower=True) # See if it needs to be run with a terminal 
+if checkArgv(argv,["-t","--terminal"]) == True:
+	terminal = "true"
+else:
+	terminal = getInput("Start with terminal? [true/False]:",Default="false",Lower=True) # See if it needs to be run with a terminal 
+
 appType = getInput("Type [Application]:",Default='Application') # Type of application
 icon = pathConv(getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg")) # What icon to use
 categories = getInput("Category, ';' separated [Utility;]:",Default="Utility;") # What catagory to use
-executable = getInput("Mark as executable? [True/false]:",Default="True",Lower=True) # See if the .desktop file needs to be marked with the execuable function
+executable = getInput("Mark as executable? [True/false]:",Default="true",Lower=True) # See if the .desktop file needs to be marked with the execuable function
 
 output = open(installPath,'w') # Open .desktop file for writing
 
