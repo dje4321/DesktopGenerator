@@ -64,7 +64,8 @@ try:
 	"""{}
 		-h --help			Prints this help message
 		-o --output			Specifys where to save the file
-		-t --terminal       Enable opening with a terminal""".format(argv[0]))
+		-t --terminal       Enable opening with a terminal
+		-i --icon           Sets what icon to use. XDG or path""".format(argv[0]))
 		sys.exit()
 
 	loop = True
@@ -84,13 +85,19 @@ try:
 	name = getInput("Name:") # Name of application
 	comment = getInput("Comment:") # Comment of application
 	execPath = pathConv(getInput("Exec:")) # Path to executable
+	
 	if checkArgv(argv,["-t","--terminal"]) == True:
 		terminal = "true"
 	else:
 		terminal = getInput("Start with terminal? [true/False]:",Default="false",Lower=True) # See if it needs to be run with a terminal 
 
 	appType = getInput("Type [Application]:",Default='Application') # Type of application
-	icon = pathConv(getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg")) # What icon to use
+	
+	if checkArgv(argv,["-i","--icon"]) == True:
+		icon = pathConv(argv[findArgv(argv,["-i","--icon"]) + 1])
+	else:
+		icon = pathConv(getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg")) # What icon to use
+	
 	categories = getInput("Category, ';' separated [Utility;]:",Default="Utility;") # What catagory to use
 	executable = getInput("Mark as executable? [True/false]:",Default="true",Lower=True) # See if the .desktop file needs to be marked with the execuable function
 
