@@ -26,7 +26,10 @@ def checkArgv(argv,condidition): # Will check to see if a argument has been pass
         sys.exit()
 
 def pathConv(path):
-	return os.path.abspath(path) # Works as a solution right now. Cant handle very complex indirect paths
+	if os.system("which realpath") == 0: # Test if realpath exsists on the system due to a bug with abspath()
+		return subprocess.getoutput("realpath {}".format(path))
+	else: # If realpath does not exsist then we fallback to the buggy abspath()
+		return os.path.abspath(path) # Need to find a elegant solution to the abspath() bug
 
 def getInput(string,Default=None,Lower=False,Upper=False): # Function to get input from user
     while True: # Run forever for incase of no input
