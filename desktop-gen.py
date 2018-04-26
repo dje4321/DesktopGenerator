@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os, time, subprocess, sys
 argv = sys.argv
-
 os.system('clear') # Clear the screen for input
 
 def findArgv(argv,condidtion): # Find the position of something in argv and returns the position
@@ -10,7 +9,7 @@ def findArgv(argv,condidtion): # Find the position of something in argv and retu
             for i in range(0,len(condidtion)):
                 if argv[x] == condidtion[i]:
                     return x
-    except Exception as e:  
+    except Exception as e:
         sys.stderr.write("findArgv()\n{}".format(e))
         sys.exit()
 
@@ -21,7 +20,7 @@ def checkArgv(argv,condidition): # Will check to see if a argument has been pass
                 if argv[x] == condidition[i]:
                     return True
         return False
-    except Exception as e:  
+    except Exception as e:
         sys.stderr.write("checkArgv()\n{}".format(e))
         sys.exit()
 
@@ -31,7 +30,7 @@ def pathConv(path):
 			return subprocess.getoutput("realpath {}".format(path))
 		else: # If realpath does not exsist then we fallback to the buggy abspath()
 			return os.path.abspath(path) # Need to find a elegant solution to the abspath() bug
-	except Exception as e:  
+	except Exception as e:
 		sys.stderr.write("pathConv()\n{}".format(e))
 		sys.exit()
 
@@ -52,70 +51,56 @@ def getInput(string,Default=None,Lower=False,Upper=False): # Function to get inp
 				return Default
 			else:
 				os.system('clear')
-	except Exception as e:  
+	except Exception as e:
 		sys.stderr.write("getInput()\n{}".format(e))
 		sys.exit()
 
+def getFile(string,Default=None):
+    while True:
+        output = pathConv(getInput("Output Destination [./output.desktop]:",Default="./output.desktop"))
+        if os.path.isfile(output) != True:
+            os.system("clear")
+            return output
+        else:
+            os.system("clear")
+            ("File already exsists")
+            time.sleep(2)
+            os.system("clear")
+
 #########################################################################################################################################
 
-try:
-	if checkArgv(argv,["-h","--help"]) == True:
-		print(
-	"""{}
-		-h --help			Prints this help message
-		-o --output			Specifys where to save the file
-		-t --terminal       Enable opening with a terminal
-		-i --icon           Sets what icon to use. XDG or path""".format(argv[0]))
-		sys.exit()
-
-	loop = True
-	while loop == True and checkArgv(argv,["-o","--output"]) != True:
-		installPath = pathConv(getInput("Install path [./output.desktop]:",Default="./output.desktop")) # Get output of desktop file
-
-		if os.path.isfile(installPath) == True:
-			os.system("clear")
-			print("Path already exsists")
-			time.sleep(2)
-			os.system("clear")
-		else:
-			loop = False
-	if checkArgv(argv,["-o","--output"]) == True:
-		installPath = pathConv(argv[findArgv(argv,["-o","--output"]) + 1])
-
-	name = getInput("Name:") # Name of application
-	comment = getInput("Comment:") # Comment of application
-	execPath = pathConv(getInput("Exec:")) # Path to executable
-	
-	if checkArgv(argv,["-t","--terminal"]) == True:
-		terminal = "true"
-	else:
-		terminal = getInput("Start with terminal? [true/False]:",Default="false",Lower=True) # See if it needs to be run with a terminal 
-
-	appType = getInput("Type [Application]:",Default='Application') # Type of application
-	
-	if checkArgv(argv,["-i","--icon"]) == True:
-		icon = pathConv(argv[findArgv(argv,["-i","--icon"]) + 1])
-	else:
-		icon = pathConv(getInput("Icon [emblem-default-symbolic.svg]:",Default="emblem-default-symbolic.svg")) # What icon to use
-	
-	categories = getInput("Category, ';' separated [Utility;]:",Default="Utility;") # What catagory to use
-	executable = getInput("Mark as executable? [True/false]:",Default="true",Lower=True) # See if the .desktop file needs to be marked with the execuable function
-
-	output = open(installPath,'w') # Open .desktop file for writing
-
-	output.write('[Desktop Entry]' + '\n') # write first line to indicate its a desktop file
-	output.write('Name=' + name + '\n') # write name of application
-	output.write('Comment=' + comment + '\n') # write comment of application
-	output.write('Exec=' + execPath + '\n') # write path to executable
-	output.write('Terminal=' + terminal + '\n') # write whether or not we need to open with terminal
-	output.write('Type=' + appType + '\n') # write application type
-	output.write('Icon=' + icon + '\n') # write what icon to use
-	output.write('Categories=' + categories + '\n') # write what category to use for the application
-
-	output.close() # close the file
-
-	if executable == "true": # Check is we need to mark .desktop as executable
-		os.system("chmod +x " + installPath)
-except Exception as e:  
-	sys.stderr.write("Main Code\n{}".format(e))
+if checkArgv(argv,["-h","--help"]) == True: # Check for help
+	print(
+    """{}
+	-h --help			Prints this help message
+	-o --output			Specifys where to save the file
+	-t --terminal       Enable opening with a terminal
+	-i --icon           Sets what icon to use. XDG or path""".format(argv[0]))
 	sys.exit()
+
+desktopFile = "[Desktop Entry]\n"
+
+if checkArgv(argv,["-o","--output"]) == True:
+    output = argv[findArgv(argv,["-o","--output"]) + 1]
+else:
+    output = getFile("Output Destination [./output.desktop]:",Default="./output.desktop") # Output file destination
+
+desktopFile += "Name={}\n".format(getInput("Name:"))                                        # App Name
+desktopFile += "Comment={}\n".format(getInput("Comment:"))                                  # App Comment
+desktopFile += "Exec={}\n".format(getInput("Executable Path:"))                             # App executable
+if checkArgv(argv,["-t","--terminal"]) == True:
+    desktopFile += "Terminal=true\n"
+else:
+    desktopFile += "Terminal={}\n".format(getInput("Terminal [true/False]:", Default="false",Lower=True))
+
+desktopFile += "Type={}\n".format(getInput("Type [Application]:", Default="Application"))
+if checkArgv(argv,["-o","--output"]) == True:
+    desktopFile += "Icon={}\n".format(argv[findArgv(argv,["-i","--icon"]) + 1])
+else:
+    desktopFile += "Icon={}\n".format(getInput("Icon [emblem-default-symbolic.svg]:", Default="emblem-default-symbolic.svg"))
+
+desktopFile += "Categories={}\n".format(getInput("Category [Utility;]:", Default="Utility;"))
+
+file = open(output,'w')
+file.write(desktopFile)
+file.close()
